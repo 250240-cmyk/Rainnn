@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бильярдный клуб Ягерь</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <canvas id="rain" aria-hidden="true"></canvas>
+
+    <header>
+        <h1>Бильярдный клуб Ягерь</h1>
+        <nav>
+            <a href="#home">Главная</a>
+            <a href="#about">О нас</a>
+            <a href="#services">Услуги</a>
+            <a href="#quiz">Опрос</a>
+            <a href="#contacts">Контакты</a>
+        </nav>
+    </header>
+
+    <section class="main" id="home">
+        <h2>Добро пожаловать в мир бильярда!</h2>
+        <img src="https://arendazala.net/upload/blog_post_block/image_pic/21-19-33_biliard.jpg" alt="Бильярдный стол">
+        <p>Отдыхай, играй и проводи время с друзьями.</p>
+        <a href="#about" class="btn">Подробнее</a>
+    </section>
+
+    <section class="about" id="about">
+        <h2>О нашем клубе</h2>
+        <p>
+            Наш бильярдный клуб отличное место для отдыха.
+            Здесь можно сыграть партию в бильярд,
+            встретиться с друзьями и приятно провести время.
+        </p>
+    </section>
+
+    <section class="services" id="services">
+        <h2>Наши услуги</h2>
+
+        <div class="cards">
+            <div class="card">
+                <h3>Русский бильярд</h3>
+                <p>Классическая игра для настоящих любителей.</p>
+            </div>
+
+            <div class="card">
+                <h3>Американский пул</h3>
+                <p>Интересная и динамичная игра.</p>
+            </div>
+
+            <div class="card">
+                <h3>Отдых с друзьями</h3>
+                <p>Хорошая атмосфера и приятное время.</p>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="quiz" id="quiz">
+        <h2>Какой бильярд тебе подходит?</h2>
+        <p class="quiz-intro">Ответь на три коротких вопроса и узнай, с чего начать!</p>
+
+        <form id="billiardQuiz">
+            <fieldset>
+                <legend>1. Какой у тебя опыт?</legend>
+                <label><input type="radio" name="experience" value="0" required> Я новичок</label>
+                <label><input type="radio" name="experience" value="1"> Иногда играю</label>
+                <label><input type="radio" name="experience" value="2"> Играю уверенно</label>
+            </fieldset>
+
+            <fieldset>
+                <legend>2. Какой стиль игры тебе больше нравится?</legend>
+                <label><input type="radio" name="style" value="0" required> Быстрая и динамичная игра</label>
+                <label><input type="radio" name="style" value="1"> Спокойная игра, где важна точность</label>
+            </fieldset>
+
+            <fieldset>
+                <legend>3. Для чего ты хочешь играть?</legend>
+                <label><input type="radio" name="goal" value="0" required> Весело провести время с друзьями</label>
+                <label><input type="radio" name="goal" value="1"> Развивать навыки и меткость</label>
+            </fieldset>
+
+            <button type="submit" class="quiz-btn">Узнать результат</button>
+            <p id="quizResult" class="quiz-result" aria-live="polite"></p>
+        </form>
+    </section>
+
+    <section class="contacts" id="contacts">
+        <h2>Контакты</h2>
+        <p>Город: Чечняяяяя</p>
+        <p>Телефон: +7 767 676 67 67</p>
+        <p>Время работы: 10:00 - 23:00</p>
+    </section>
+
+    <footer>
+        <p>© 2026 Бильярдный клуб Ягерь. Все права защищены.</p>
+    </footer>
+
+    <script>
+        document.getElementById('billiardQuiz').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const answers = new FormData(this);
+            const score = Number(answers.get('experience')) +
+                          Number(answers.get('style')) +
+                          Number(answers.get('goal'));
+            const result = document.getElementById('quizResult');
+
+            if (score <= 2) {
+                result.textContent = 'Тебе отлично подойдёт американский пул! Он динамичный и отлично подходит для игры с друзьями.';
+            } else {
+                result.textContent = 'Попробуй русский бильярд! В нём особенно важны точность, расчёт и мастерство.';
+            }
+        });
+    </script>
+
+    <script>
+
+        (function () {
+            const canvas = document.getElementById('rain');
+            const ctx = canvas.getContext('2d');
+
+            let width, height, dpr;
+            let drops = [];
+            let splashes = [];
+
+            function createDrop(randomY) {
+                const speed = 12 + Math.random() * 10;
+                return {
+                    x: Math.random() * (width + 200) - 100,
+                    y: randomY ? Math.random() * height : -Math.random() * 100,
+                    length: 12 + Math.random() * 16,
+                    speed: speed,
+                    wind: speed * 0.12,
+                    alpha: 0.2 + Math.random() * 0.35
+                };
+            }
+
+            function resize() {
+                dpr = window.devicePixelRatio || 1;
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                const count = Math.min(300, Math.floor(width / 5));
+                drops = [];
+                for (let i = 0; i < count; i++) {
+                    drops.push(createDrop(true));
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+                ctx.lineWidth = 1.2;
+                ctx.lineCap = 'round';
+
+                for (const d of drops) {
+                    ctx.strokeStyle = 'rgba(190, 215, 255,' + d.alpha + ')';
+                    ctx.beginPath();
+                    ctx.moveTo(d.x, d.y);
+                    ctx.lineTo(d.x - d.wind * (d.length / d.speed), d.y + d.length);
+                    ctx.stroke();
+
+                    d.x -= d.wind;
+                    d.y += d.speed;
+
+                    if (d.y > height) {
+
+                        if (Math.random() < 0.25) {
+                            splashes.push({ x: d.x, y: height - 1, r: 1, alpha: d.alpha });
+                        }
+                        Object.assign(d, createDrop(false));
+                    }
+                }
+
+                for (let i = splashes.length - 1; i >= 0; i--) {
+                    const s = splashes[i];
+                    ctx.strokeStyle = 'rgba(190, 215, 255,' + s.alpha + ')';
+                    ctx.beginPath();
+                    ctx.ellipse(s.x, s.y, s.r * 2, s.r, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+                    s.r += 0.35;
+                    s.alpha -= 0.025;
+                    if (s.alpha <= 0) splashes.splice(i, 1);
+                }
+
+                requestAnimationFrame(draw);
+            }
+
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+            draw();
+        })();
+    </script>
+</body>
+</html>
